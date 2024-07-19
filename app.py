@@ -7,6 +7,8 @@ from wtforms import StringField, PasswordField, BooleanField, FloatField, Intege
 from wtforms.validators import DataRequired, Length, NumberRange
 import google.generativeai as genai
 import os
+import json
+import markdown
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback_secret_key')
@@ -176,14 +178,40 @@ def generate_tactics():
     
     if request.method == 'POST':
         players = Player.query.all()
-        player_data = [f"{p.name} - {p.position} - Goals: {p.goals}, Assists: {p.assists}, Matches: {p.matches_played}" for p in players]
+        player_data = [
+            {
+                "name": p.name,
+                "position": p.position,
+                "age": p.age,
+                "height": p.height,
+                "weight": p.weight,
+                "goals": p.goals,
+                "assists": p.assists,
+                "matches_played": p.matches_played
+            } for p in players
+        ]
         
-        prompt = f"Given the following player data for a football team, suggest a formation and tactics:\n\n{player_data}"
+        prompt = f"""
+        As an expert football tactician, analyze the following player data and provide a comprehensive tactical plan:
+
+        {json.dumps(player_data, indent=2)}
+
+        Your analysis should include:
+        1. Recommended formation with detailed explanations
+        2. Offensive strategies tailored to the team's strengths
+        3. Defensive approach considering the team's composition
+        4. Set-piece tactics for both attacking and defending
+        5. Player roles and key responsibilities
+        6. Suggestions for player development and team improvement
+
+        Provide your analysis in a structured format, using markdown for headers and bullet points.
+        """
         
         try:
             model = genai.GenerativeModel('gemini-pro')
             response = model.generate_content(prompt)
-            return render_template('tactics.html', tactics=response.text)
+            tactics_html = markdown.markdown(response.text)
+            return render_template('tactics.html', tactics=tactics_html)
         except Exception as e:
             flash(f"Error generating tactics: {str(e)}", 'error')
             return redirect(url_for('dashboard'))
