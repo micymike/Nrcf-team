@@ -202,7 +202,7 @@ def generate_tactics():
         3. Defensive approach considering the team's composition
         4. Set-piece tactics for both attacking and defending
         5. Player roles and key responsibilities
-        6. Suggestions for player development and team improvement
+        6. Suggestions for player development and team improvement.
 
         Provide your analysis in a structured format, using markdown for headers and bullet points.
         """
