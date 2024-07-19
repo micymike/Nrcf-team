@@ -3,9 +3,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, FloatField, IntegerField
+from wtforms import StringField, PasswordField, BooleanField, FloatField, IntegerField, FileField
 from wtforms.validators import DataRequired, Length, NumberRange
+from werkzeug.utils import secure_filename
 import google.generativeai as genai
+from flask_migrate import Migrate
 import os
 import json
 import markdown
@@ -15,8 +17,10 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback_secret_key')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///nrcf_football.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['WTF_CSRF_ENABLED'] = True
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
@@ -45,6 +49,7 @@ class Player(db.Model):
     goals = db.Column(db.Integer, default=0)
     assists = db.Column(db.Integer, default=0)
     matches_played = db.Column(db.Integer, default=0)
+    picture = db.Column(db.String(255))
 
 # Forms
 class RegistrationForm(FlaskForm):
@@ -61,11 +66,13 @@ class PlayerForm(FlaskForm):
     age = IntegerField('Age', validators=[DataRequired(), NumberRange(min=15, max=50)])
     height = FloatField('Height (cm)', validators=[DataRequired(), NumberRange(min=150, max=220)])
     weight = FloatField('Weight (kg)', validators=[DataRequired(), NumberRange(min=50, max=120)])
+    picture = FileField('Profile Picture')
 
 class PlayerUpdateForm(FlaskForm):
     goals = IntegerField('Goals', validators=[NumberRange(min=0)])
     assists = IntegerField('Assists', validators=[NumberRange(min=0)])
     matches_played = IntegerField('Matches Played', validators=[NumberRange(min=0)])
+    picture = FileField('Profile Picture')
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -137,10 +144,8 @@ def logout():
 def dashboard():
     players = Player.query.all()
     if current_user.is_coach:
-        print("Redirecting to coach dashboard")  # Debug print
         return render_template('coach_dashboard.html', players=players)
     else:
-        print("Redirecting to player dashboard")  # Debug print
         return render_template('player_dashboard.html', players=players)
 
 @app.route('/add_player', methods=['GET', 'POST'])
@@ -159,6 +164,10 @@ def add_player():
             height=form.height.data,
             weight=form.weight.data
         )
+        if form.picture.data:
+            filename = secure_filename(form.picture.data.filename)
+            form.picture.data.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            new_player.picture = filename
         db.session.add(new_player)
         db.session.commit()
         flash('Player added successfully', 'success')
@@ -176,6 +185,10 @@ def update_player(player_id):
     form = PlayerUpdateForm(obj=player)
     if form.validate_on_submit():
         form.populate_obj(player)
+        if form.picture.data:
+            filename = secure_filename(form.picture.data.filename)
+            form.picture.data.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            player.picture = filename
         db.session.commit()
         flash('Player record updated successfully', 'success')
         return redirect(url_for('dashboard'))

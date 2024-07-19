@@ -1,38 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Player</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
-    <div class="container">
-        <h2 class="mt-5">Add Player</h2>
-        <form method="POST">
-            {{ form.hidden_tag() }}
-            <div class="form-group">
-                {{ form.name.label(class="form-label") }}
-                {{ form.name(class="form-control") }}
-            </div>
-            <div class="form-group">
-                {{ form.position.label(class="form-label") }}
-                {{ form.position(class="form-control") }}
-            </div>
-            <div class="form-group">
-                {{ form.age.label(class="form-label") }}
-                {{ form.age(class="form-control") }}
-            </div>
-            <div class="form-group">
-                {{ form.height.label(class="form-label") }}
-                {{ form.height(class="form-control") }}
-            </div>
-            <div class="form-group">
-                {{ form.weight.label(class="form-label") }}
-                {{ form.weight(class="form-control") }}
-            </div>
-            <button type="submit" class="btn btn-primary">Add Player</button>
-        </form>
-    </div>
-</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h2 class="text-2xl font-bold mb-6 text-center">Add Player</h2>
+    <form method="POST" enctype="multipart/form-data" class="max-w-lg mx-auto bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        {{ form.hidden_tag() }}
+        <div class="mb-4">
+            {{ form.name.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+            {{ form.name(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+        </div>
+        <div class="mb-4">
+            {{ form.position.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+            {{ form.position(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+        </div>
+        <div class="mb-4">
+            {{ form.age.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+            {{ form.age(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+        </div>
+        <div class="mb-4">
+            {{ form.height.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+            {{ form.height(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+        </div>
+        <div class="mb-4">
+            {{ form.weight.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+            {{ form.weight(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+        </div>
+        <div class="mb-4">
+            {{ form.picture.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+            {{ form.picture(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+        </div>
+        <div class="flex items-center justify-between">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                Add Player
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

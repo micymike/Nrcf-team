@@ -1,54 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Player Dashboard</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        .container { margin-top: 50px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1 class="text-center mb-4">Player Dashboard</h1>
-        
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        
-        <table class="table table-striped">
+{% extends "base.html" %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6 text-center">Player Dashboard</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="bg-{{ category }}-100 border border-{{ category }}-400 text-{{ category }}-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <span class="block sm:inline">{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="overflow-x-auto bg-white shadow-md rounded my-6">
+        <table class="min-w-full table-auto">
             <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Position</th>
-                    <th>Age</th>
-                    <th>Height</th>
-                    <th>Weight</th>
-                    <th>Goals</th>
-                    <th>Assists</th>
-                    <th>Matches Played</th>
+                <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                    <th class="py-3 px-6 text-left">Player Details</th>
+                    <th class="py-3 px-6 text-center">Goals</th>
+                    <th class="py-3 px-6 text-center">Assists</th>
+                    <th class="py-3 px-6 text-center">Matches Played</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="text-gray-600 text-sm font-light">
                 {% for player in players %}
-                <tr>
-                    <td>{{ player.name }}</td>
-                    <td>{{ player.position }}</td>
-                    <td>{{ player.age }}</td>
-                    <td>{{ player.height }}</td>
-                    <td>{{ player.weight }}</td>
-                    <td>{{ player.goals }}</td>
-                    <td>{{ player.assists }}</td>
-                    <td>{{ player.matches_played }}</td>
+                <tr class="border-b border-gray-200 hover:bg-gray-100">
+                    <td class="py-3 px-6 text-left whitespace-nowrap">
+                        <div class="flex items-center">
+                            <img class="w-10 h-10 rounded-full mr-3" src="{{ url_for('static', filename='uploads/' + player.picture) if player.picture else url_for('static', filename='default_profile.png') }}" alt="{{ player.name }}'s profile">
+                            <div>
+                                <span class="font-medium">{{ player.name }}</span><br>
+                                <span class="text-xs">{{ player.position }}, {{ player.age }} years</span><br>
+                                <span class="text-xs">{{ player.height }} cm, {{ player.weight }} kg</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-3 px-6 text-center">{{ player.goals }}</td>
+                    <td class="py-3 px-6 text-center">{{ player.assists }}</td>
+                    <td class="py-3 px-6 text-center">{{ player.matches_played }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}
