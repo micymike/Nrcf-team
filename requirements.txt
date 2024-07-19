@@ -5,3 +5,4 @@ Flask-Login
 Werkzeug
 WTForms
 google-generativeai
+python-dotenv
