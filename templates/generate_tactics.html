@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Tactics</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h2 class="mt-5">Generate Tactics</h2>
+        <form method="POST">
+            <button type="submit" class="btn btn-primary">Generate</button>
+        </form>
+        {% if tactics %}
+            <div class="mt-4">
+                <h4>Tactics:</h4>
+                <p>{{ tactics }}</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

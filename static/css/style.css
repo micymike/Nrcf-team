@@ -1,0 +1,162 @@
+/* static/css/style.css */
+:root {
+    --primary-color: #1e90ff;
+    --secondary-color: #f0f8ff;
+    --text-color: #333;
+    --background-color: #f4f4f4;
+    --error-color: #ff4444;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1rem;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 1rem;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+main {
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+h1, h2 {
+    color: var(--primary-color);
+}
+
+form {
+    background-color: var(--secondary-color);
+    padding: 1rem;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"] {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+button, .button {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+button:hover, .button:hover {
+    background-color: #1a7adf;
+}
+
+.flashes {
+    list-style-type: none;
+    padding: 1rem;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 3px;
+    color: #721c24;
+    margin-bottom: 1rem;
+}
+
+.error {
+    color: var(--error-color);
+    font-size: 0.9em;
+    margin-top: 0.2rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+th, td {
+    padding: 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: var(--secondary-color);
+    font-weight: bold;
+}
+
+.action-buttons {
+    margin-bottom: 1rem;
+}
+
+.button.small {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.9em;
+}
+
+.tactics-container {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    white-space: pre-wrap;
+}
+
+footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: var(--primary-color);
+    color: white;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+@media (max-width: 600px) {
+    main {
+        padding: 1rem;
+    }
+    
+    nav ul li {
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    table, th, td {
+        font-size: 0.9em;
+    }
+}

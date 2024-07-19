@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Tactics{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">Generate Tactics</h1>
+
+{% if tactics %}
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-semibold mb-4">Suggested Tactics</h2>
+        <div class="prose max-w-none">
+            {{ tactics|safe }}
+        </div>
+    </div>
+{% else %}
+    <form method="POST" class="mb-8">
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Generate Tactics
+        </button>
+    </form>
+{% endif %}
+{% endblock %}

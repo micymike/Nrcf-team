@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Player</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h2 class="mt-5">Update Player</h2>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.goals.label(class="form-label") }}
+                {{ form.goals(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.assists.label(class="form-label") }}
+                {{ form.assists(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.matches_played.label(class="form-label") }}
+                {{ form.matches_played(class="form-control") }}
+            </div>
+            <button type="submit" class="btn btn-primary">Update Player</button>
+        </form>
+    </div>
+</body>
+</html>
