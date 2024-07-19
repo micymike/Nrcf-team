@@ -110,11 +110,11 @@ def logout():
 @app.route('/dashboard')
 @login_required
 def dashboard():
+    players = Player.query.all()
     if current_user.is_coach:
-        players = Player.query.all()
-        return render_template('dashboard.html', players=players)
+        return render_template('coach_dashboard.html', players=players)
     else:
-        return render_template('dashboard.html')
+        return render_template('player_dashboard.html', players=players)
 
 @app.route('/add_player', methods=['GET', 'POST'])
 @login_required
@@ -136,7 +136,7 @@ def add_player():
         db.session.commit()
         flash('Player added successfully', 'success')
         return redirect(url_for('dashboard'))
-    return render_template('player_form.html', form=form)
+    return render_template('player_form.html', form=form, title='Add Player')
 
 @app.route('/update_player/<int:player_id>', methods=['GET', 'POST'])
 @login_required
@@ -152,7 +152,7 @@ def update_player(player_id):
         db.session.commit()
         flash('Player record updated successfully', 'success')
         return redirect(url_for('dashboard'))
-    return render_template('player_form.html', form=form, player=player)
+    return render_template('player_form.html', form=form, player=player, title='Update Player')
 
 @app.route('/delete_player/<int:player_id>', methods=['POST'])
 @login_required

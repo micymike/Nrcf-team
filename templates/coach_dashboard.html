@@ -4,29 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coach Dashboard</title>
-    <!-- Bootstrap CSS for styling -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-    <!-- Custom CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        .container {
-            margin-top: 50px;
-        }
+        .container { margin-top: 50px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1 class="text-center mb-4">Coach Dashboard</h1>
+        
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        {{ message }}
-                    </div>
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
         
-        <!-- Example Player Table -->
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -62,6 +56,9 @@
                 {% endfor %}
             </tbody>
         </table>
+        
+        <a href="{{ url_for('add_player') }}" class="btn btn-success">Add New Player</a>
+        <a href="{{ url_for('generate_tactics') }}" class="btn btn-info">Generate Tactics</a>
     </div>
 </body>
 </html>
