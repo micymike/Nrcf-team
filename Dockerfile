@@ -24,7 +24,7 @@ RUN pip install python-dotenv
 COPY . /app/
 
 # Expose port 5000 to allow communication to/from the Flask web server
-EXPOSE 5000
+
 
 # Command to run the application
-CMD ["python", "app.py"]
+CMD ["gunicorn", "app:app", "-b", "0.0.0.0:7860"]
