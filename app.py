@@ -23,6 +23,10 @@ login_manager.login_view = 'login'
 # Configure the Gemini API
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY'))
 
+# Hardcoded coach credentials
+COACH_USERNAME = "coach"
+COACH_PASSWORD = "nrcf@2024"
+
 # User model
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -46,7 +50,6 @@ class Player(db.Model):
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=4, max=80)])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    is_coach = BooleanField('Register as Coach')
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -84,7 +87,7 @@ def register():
         new_user = User(
             username=form.username.data,
             password=generate_password_hash(form.password.data, method='pbkdf2:sha256'),
-            is_coach=form.is_coach.data
+            is_coach=False  # All registered users are players by default
         )
         db.session.add(new_user)
         db.session.commit()
@@ -96,10 +99,30 @@ def register():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user and check_password_hash(user.password, form.password.data):
-            login_user(user)
+        if form.username.data == COACH_USERNAME and form.password.data == COACH_PASSWORD:
+            # Check if coach user already exists in the database
+            coach_user = User.query.filter_by(username=COACH_USERNAME).first()
+            if not coach_user:
+                # Create coach user if it doesn't exist
+                coach_user = User(username=COACH_USERNAME, 
+                                  password=generate_password_hash(COACH_PASSWORD, method='pbkdf2:sha256'),
+                                  is_coach=True)
+                db.session.add(coach_user)
+                db.session.commit()
+            else:
+                # Ensure existing coach user has is_coach set to True
+                coach_user.is_coach = True
+                db.session.commit()
+            
+            login_user(coach_user)
+            flash('Logged in successfully as Coach', 'success')
             return redirect(url_for('dashboard'))
+        else:
+            user = User.query.filter_by(username=form.username.data).first()
+            if user and check_password_hash(user.password, form.password.data):
+                login_user(user)
+                flash('Logged in successfully', 'success')
+                return redirect(url_for('dashboard'))
         flash('Invalid username or password', 'error')
     return render_template('login.html', form=form)
 
@@ -114,8 +137,10 @@ def logout():
 def dashboard():
     players = Player.query.all()
     if current_user.is_coach:
+        print("Redirecting to coach dashboard")  # Debug print
         return render_template('coach_dashboard.html', players=players)
     else:
+        print("Redirecting to player dashboard")  # Debug print
         return render_template('player_dashboard.html', players=players)
 
 @app.route('/add_player', methods=['GET', 'POST'])
@@ -221,4 +246,16 @@ def generate_tactics():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+        
+        # Ensure coach user exists and has is_coach set to True
+        coach_user = User.query.filter_by(username=COACH_USERNAME).first()
+        if not coach_user:
+            coach_user = User(username=COACH_USERNAME, 
+                              password=generate_password_hash(COACH_PASSWORD, method='pbkdf2:sha256'),
+                              is_coach=True)
+            db.session.add(coach_user)
+        else:
+            coach_user.is_coach = True
+        db.session.commit()
+        
     app.run(debug=True)
