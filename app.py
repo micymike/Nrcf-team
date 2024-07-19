@@ -184,11 +184,18 @@ def update_player(player_id):
     player = Player.query.get_or_404(player_id)
     form = PlayerUpdateForm(obj=player)
     if form.validate_on_submit():
-        form.populate_obj(player)
+        player.goals = form.goals.data
+        player.assists = form.assists.data
+        player.matches_played = form.matches_played.data
+        
         if form.picture.data:
+            # Only process the picture if a file was actually uploaded
             filename = secure_filename(form.picture.data.filename)
-            form.picture.data.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            player.picture = filename
+            if filename:  # Extra check to ensure filename is not empty
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                form.picture.data.save(file_path)
+                player.picture = filename
+        
         db.session.commit()
         flash('Player record updated successfully', 'success')
         return redirect(url_for('dashboard'))
