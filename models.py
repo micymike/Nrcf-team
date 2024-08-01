@@ -7,7 +7,7 @@ from bson import ObjectId
 from pymongo import MongoClient
 
 # Assuming you have a MongoDB setup
-client = MongoClient('mongodb://localhost:27017/')
+client = MongoClient('mongodb+srv://mosesmichael878:mikemoses@cluster.elwxr3g.mongodb.net/?retryWrites=true&w=majority&appName=cluster')
 db = client['nrcf_football']
 
 class User(UserMixin):
