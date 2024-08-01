@@ -20,8 +20,7 @@
     }
 </style>
 <div class="container mx-auto px-4 py-8">
-    <!-- <h1 class="text-3xl  font-bold mb-6 text-center animate-bounce">Coach Dashboard</h1> -->
-    <marquee behavior="" direction="left" class="text-3xl text-blue-400 font-extrabold mb-6" >Coach Dashboard</marquee>
+    <marquee behavior="" direction="left" class="text-3xl text-blue-400 font-extrabold mb-6">Coach Dashboard</marquee>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
@@ -31,6 +30,19 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
+
+    <!-- File Upload Form -->
+    <div class="bg-white shadow-md rounded my-6 p-4">
+        <form action="{{ url_for('uploaded_file') }}" method="POST" enctype="multipart/form-data">
+            <div class="mb-4">
+                <label for="file" class="block text-gray-700 text-sm font-bold mb-2">Upload File:</label>
+                <input type="file" name="file" id="file" class="border border-gray-300 rounded-lg p-2 w-full">
+            </div>
+            <div class="flex justify-center">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Upload</button>
+            </div>
+        </form>
+    </div>
 
     <div class="overflow-x-auto bg-white shadow-md rounded my-6">
         <table class="min-w-full table-auto">
