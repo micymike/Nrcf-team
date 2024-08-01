@@ -9,3 +9,4 @@ python-dotenv
 Gunicorn
 markdown
 flask-migrate
+pymongo
