@@ -13,7 +13,7 @@ import os
 import json
 import markdown
 
-from models import LoginForm, PlayerForm, PlayerUpdateForm, RegistrationForm, User, db
+from models import Formation, LoginForm, PlayerForm, PlayerUpdateForm, RegistrationForm, User, db
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24).hex()
@@ -248,29 +248,74 @@ def search_players():
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
+app.config['ALLOWED_EXTENSIONS'] = {'pdf', 'txt'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+@app.route('/upload_file', methods=['GET', 'POST'])
+@login_required
+def upload_file():
+    if not current_user.is_coach:
+        flash('Only coaches can upload files', 'error')
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('No file part', 'error')
+            return redirect(request.url)
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file', 'error')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            flash('File successfully uploaded', 'success')
+            return redirect(url_for('news'))
+    return render_template('upload_file.html')
+
+@app.route('/news')
+@login_required
+def news():
+    files = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if allowed_file(f)]
+    return render_template('news.html', files=files)
+
 @app.route('/uploads/<filename>')
+@login_required
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-# Route to delete a file
-@app.route('/delete/<filename>', methods=['POST'])
+@app.route('/delete_file/<filename>', methods=['POST'])
+@login_required
 def delete_file(filename):
-    try:
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        if os.path.exists(file_path):
-            os.remove(file_path)
-            flash('File successfully deleted.', 'success')
-        else:
-            flash('File not found.', 'error')
-    except Exception as e:
-        flash(str(e), 'error')
-    return redirect(url_for('post'))
+    if not current_user.is_coach:
+        flash('Only coaches can delete files', 'error')
+        return redirect(url_for('news'))
 
-# Render the post template with file data
-@app.route('/post')
-def post():
-    files = [{'name': f, 'path': f} for f in os.listdir(app.config['UPLOAD_FOLDER']) if os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'], f))]
-    return render_template('post.html', files=files)
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        flash('File successfully deleted', 'success')
+    else:
+        flash('File not found', 'error')
+    return redirect(url_for('news'))
+
+@app.route('/form')
+@login_required
+def form():
+    return render_template('form.html')
+
+@app.route('/save_formation', methods=['POST'])
+@login_required
+def save_formation():
+    data = request.json
+    formation = data.get('formation')
+    if formation:
+        formation_id = Formation.save_formation(current_user.id, formation)
+        return jsonify(success=True, formation_id=formation_id)
+    return jsonify(success=False)
+
 
 @app.errorhandler(404)
 def page_not_found(e):

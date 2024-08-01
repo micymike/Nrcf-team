@@ -31,18 +31,6 @@
         {% endif %}
     {% endwith %}
 
-    <!-- File Upload Form -->
-    <div class="bg-white shadow-md rounded my-6 p-4">
-        <form action="{{ url_for('uploaded_file') }}" method="POST" enctype="multipart/form-data">
-            <div class="mb-4">
-                <label for="file" class="block text-gray-700 text-sm font-bold mb-2">Upload File:</label>
-                <input type="file" name="file" id="file" class="border border-gray-300 rounded-lg p-2 w-full">
-            </div>
-            <div class="flex justify-center">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Upload</button>
-            </div>
-        </form>
-    </div>
 
     <div class="overflow-x-auto bg-white shadow-md rounded my-6">
         <table class="min-w-full table-auto">

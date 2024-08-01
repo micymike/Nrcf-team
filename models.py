@@ -44,3 +44,24 @@ class PlayerUpdateForm(FlaskForm):
     assists = IntegerField('Assists', validators=[NumberRange(min=0)])
     matches_played = IntegerField('Matches Played', validators=[NumberRange(min=0)])
     picture = FileField('Profile Picture')
+
+# Formation model
+class Formation:
+    def __init__(self, formation_data):
+        self.id = str(formation_data['_id'])
+        self.coach_id = str(formation_data['coach_id'])
+        self.formation = formation_data['formation']
+
+    @staticmethod
+    def save_formation(coach_id, formation_data):
+        formation = {
+            'coach_id': ObjectId(coach_id),
+            'formation': formation_data
+        }
+        result = db.formations.insert_one(formation)
+        return str(result.inserted_id)
+
+    @staticmethod
+    def get_formation(formation_id):
+        formation_data = db.formations.find_one({'_id': ObjectId(formation_id)})
+        return Formation(formation_data) if formation_data else None

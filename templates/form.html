@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Football Formation Board</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        #board {
+            width: 100%;
+            height: 70vh;
+            max-height: 600px;
+        }
+        .player {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto py-8 px-4">
+        <h1 class="text-4xl font-bold text-center mb-6 text-gray-800">NRCF Football Formation Board</h1>
+        <div id="board" class="border rounded-lg shadow-xl mb-6 bg-green-600 relative overflow-hidden"></div>
+        <div class="flex justify-center space-x-4">
+            <button id="saveFormation" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                Save Formation
+            </button>
+            <button id="resetFormation" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+                Reset Formation
+            </button>
+            <button  class="bg-red-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:ring-opacity-50"><a href="{{ url_for('generate_tactics') }}"> Back </a>
+                
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // Set up the scene, camera, and renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / (window.innerHeight * 0.7), 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        const boardElement = document.getElementById('board');
+        renderer.setSize(boardElement.clientWidth, boardElement.clientHeight);
+        boardElement.appendChild(renderer.domElement);
+        
+        // Load textures
+        const textureLoader = new THREE.TextureLoader();
+        const fieldTexture = textureLoader.load('static/img/board.avif', () => {
+            renderer.render(scene, camera);
+        });
+        
+        // Create the pitch
+        const geometry = new THREE.PlaneGeometry(10, 7);
+        const material = new THREE.MeshBasicMaterial({ map: fieldTexture, side: THREE.DoubleSide });
+        const plane = new THREE.Mesh(geometry, material);
+        plane.rotateX(-Math.PI / 2);
+        scene.add(plane);
+
+        // Create players
+        const players = [];
+        const playerGeometry = new THREE.SphereGeometry(0.15, 32, 32);
+        const playerMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff }); // White color for players
+
+        // Initial positions
+        const initialPositions = [
+            { x: 0, z: -3 },  // Goalkeeper
+            { x: -2, z: -2 }, { x: -1, z: -2 }, { x: 1, z: -2 }, { x: 2, z: -2 },  // Defenders
+            { x: -2, z: 0 }, { x: 0, z: 0 }, { x: 2, z: 0 },  // Midfielders
+            { x: -1.5, z: 2 }, { x: 0, z: 2.5 }, { x: 1.5, z: 2 }  // Forwards
+        ];
+
+        initialPositions.forEach((pos, i) => {
+            const player = new THREE.Mesh(playerGeometry, playerMaterial);
+            player.position.set(pos.x, 0.15, pos.z);
+            player.userData = { draggable: true, index: i };
+            players.push(player);
+            scene.add(player);
+        });
+
+        // Set camera position
+        camera.position.set(0, 7, 0);
+        camera.lookAt(0, 0, 0);
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Raycasting for player movement
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let selectedPlayer = null;
+
+        function onMouseDown(event) {
+            const rect = boardElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(players);
+
+            if (intersects.length > 0) {
+                selectedPlayer = intersects[0].object;
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            }
+        }
+
+        function onMouseMove(event) {
+            if (selectedPlayer) {
+                const rect = boardElement.getBoundingClientRect();
+                mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObject(plane);
+
+                if (intersects.length > 0) {
+                    selectedPlayer.position.copy(intersects[0].point);
+                    selectedPlayer.position.y = 0.15;
+                }
+            }
+        }
+
+        function onMouseUp() {
+            selectedPlayer = null;
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        }
+
+        boardElement.addEventListener('mousedown', onMouseDown);
+
+        window.addEventListener('resize', () => {
+            camera.aspect = boardElement.clientWidth / boardElement.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(boardElement.clientWidth, boardElement.clientHeight);
+        });
+
+        // Save and reset formation
+        document.getElementById('saveFormation').addEventListener('click', () => {
+            const formation = players.map(player => ({
+                x: player.position.x,
+                y: player.position.z,
+                index: player.userData.index
+            }));
+            console.log('Formation saved:', formation);
+            // Send this data to a server or handle it as needed
+            alert('Formation saved successfully!');
+        });
+
+        document.getElementById('resetFormation').addEventListener('click', () => {
+            players.forEach((player, i) => {
+                player.position.set(initialPositions[i].x, 0.15, initialPositions[i].z);
+            });
+        });
+    </script>
+</body>
+</html>
